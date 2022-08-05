@@ -1,9 +1,13 @@
 {
-    "compilerOptions": {
-        "outDir": "dist/js",
-        "target": "ES6",
-        "noEmitOnError": true,
-        "noImplicitAny": true
-    },
-    "include": ["app/**/*"]
+  "compilerOptions": {
+    // gravacao de arquivos resultantes
+    "outDir": "dist/js",
+    // ecmascript que o ts será convertido
+    "target": "ES6",
+    // não compilar arquivos com erro
+    "noEmitOnError": true,
+    // não compliar arquivos com implicidade
+    "noImplicitAny": true
+  },
+  "include": ["app/**/*"]
 }
