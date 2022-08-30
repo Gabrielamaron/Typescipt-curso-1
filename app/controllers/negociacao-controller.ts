@@ -1,6 +1,7 @@
 import { Negociacao } from "../models/negociacao.js";
 import { Negociacoes } from "../models/negociacoes.js";
-import { NegociacoesView } from "../views/negociacoes-view.js";
+import { MensagemView } from "../views/Mensagem-view.js";
+import { NegociacoesView } from "../views/Negociacoes-view.js";
 
 export class NegociacaoController {
   private inputData: HTMLInputElement;
@@ -8,6 +9,7 @@ export class NegociacaoController {
   private inputValor: HTMLInputElement;
   private negociacoes = new Negociacoes();
   private negociacoesView = new NegociacoesView("#negociacoesView");
+  private mensagemView = new MensagemView("#mensagemView");
 
   constructor() {
     this.inputData = document.querySelector("#data");
@@ -16,27 +18,53 @@ export class NegociacaoController {
     this.negociacoesView.update(this.negociacoes);
   }
 
-  adiciona(): void {
-    const novaNegociacao = this.criaNegociacao();
-    this.limparFormulario();
+  public adiciona(): void {
+    const dataFormatada = this.formataData();
 
+    if (this.verificacaoDiaUtil(dataFormatada)) return;
+    const novaNegociacao = this.criaNegociacao(dataFormatada);
     this.negociacoes.adiciona(novaNegociacao);
-    console.log("Executando comando para adicionar nova negociação");
-    this.negociacoesView.update(this.negociacoes);
+    this.atualizaView();
+    this.limparFormulario();
   }
 
-  criaNegociacao(): Negociacao {
+  private verificacaoDiaUtil(dataFormatada: Date): boolean {
+    if (dataFormatada.getDay() == 0 || dataFormatada.getDay() == 6) {
+      this.mensagemView.update(
+        "Essa negociacâo nâo pode ser criada pois não foi realizada em dia útil!"
+      );
+      return true;
+    }
+    this.mensagemView.update("");
+    return false;
+  }
+
+  private formataData(): Date {
+    const exp = /-/g;
+    const iData = this.inputData.value;
+    return new Date(iData.replace(exp, ","));
+  }
+
+  private criaNegociacao(dataFormatada: Date): Negociacao {
     return new Negociacao(
-      this.inputData.valueAsDate,
+      dataFormatada,
       this.inputQuantidade.valueAsNumber,
       this.inputValor.valueAsNumber
     );
   }
 
-  limparFormulario(): void {
+  private limparFormulario(): void {
     this.inputData.value = "";
     this.inputQuantidade.value = "1";
     this.inputValor.value = "0.0";
     this.inputData.focus();
+  }
+
+  private atualizaView(): void {
+    this.negociacoesView.update(this.negociacoes);
+    this.mensagemView.update("Negociação adicionada com sucesso!");
+    setTimeout(() => {
+      this.mensagemView.remove();
+    }, 4275);
   }
 }
